@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Addon GG | Platform Addon Minecraft</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    
+    <style>
+        /* ===== VARIABLES & RESET ===== */
+        :root {
+            --primary-green: #2ecc71;
+            --dark-green: #27ae60;
+            --light-green: #57e68c;
+            --accent-green: #1abc9c;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #6c757d;
+            --darker-gray: #343a40;
+            --shadow: 0 10px 30px rgba(46, 204, 113, 0.1);
+            --shadow-dark: 0 15px 40px rgba(46, 204, 113, 0.15);
+            --gradient-primary: linear-gradient(135deg, #2ecc71 0%, #1abc9c 100%);
+            --gradient-secondary: linear-gradient(135deg, #27ae60 0%, #16a085 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--white);
+            color: var(--darker-gray);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: var(--white);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            padding: 10px 0;
+            box-shadow: 0 8px 25px rgba(46, 204, 113, 0.12);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--primary-green) !important;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand i {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--darker-gray) !important;
+            margin: 0 8px;
+            padding: 8px 16px !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-green) !important;
+            background: rgba(46, 204, 113, 0.08);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 70%;
+        }
+
+        .navbar-toggler {
+            border: none;
+            padding: 8px;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero-section {
+            background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)), 
+                        url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            padding: 180px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(46, 204, 113, 0.1) 0%, rgba(26, 188, 156, 0.1) 100%);
+            z-index: -1;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-stats {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            margin-top: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-stats::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: var(--gradient-primary);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            background: var(--gradient-primary);
+            border: none;
+            padding: 12px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(46, 204, 113, 0.4);
+            background: var(--gradient-secondary);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary-green);
+            color: var(--primary-green);
+            padding: 10px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-green);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-google {
+            background: var(--white);
+            color: var(--darker-gray);
+            border: 2px solid var(--medium-gray);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .btn-google:hover {
+            background: var(--light-gray);
+            border-color: var(--dark-gray);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-dark);
+        }
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .card-title {
+            font-weight: 700;
+            color: var(--darker-gray);
+            margin-bottom: 12px;
+        }
+
+        .card-text {
+            color: var(--dark-gray);
+            font-size: 0.95rem;
+        }
+
+        /* ===== FEATURES ===== */
+        .feature-card {
+            text-align: center;
+            padding: 40px 30px;
+            border-radius: 16px;
+            background: var(--white);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-dark);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 2rem;
+            color: var(--white);
+        }
+
+        /* ===== LOGIN PAGE ===== */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 120px 0 60px;
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.05) 0%, rgba(26, 188, 156, 0.05) 100%);
+        }
+
+        .login-card {
+            background: var(--white);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-dark);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .login-header {
+            background: var(--gradient-primary);
+            padding: 40px;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .login-body {
+            padding: 40px;
+        }
+
+        /* ===== DASHBOARD ===== */
+        .dashboard-header {
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: 80px 0 40px;
+            margin-top: 70px;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .user-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ===== UPLOAD FORM ===== */
+        .upload-container {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            margin: 40px auto;
+            max-width: 800px;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--medium-gray);
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.25rem rgba(46, 204, 113, 0.25);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            color: var(--medium-gray);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--darker-gray);
+            color: var(--white);
+            padding: 60px 0 30px;
+            margin-top: 80px;
+        }
+
+        .footer h5 {
+            color: var(--white);
+            margin-bottom: 25px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer h5::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+        }
+
+        .footer-links a {
+            color: var(--medium-gray);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-green);
+            padding-left: 5px;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+            
+            .dashboard-header {
+                padding: 60px 0 30px;
+            }
+            
+            .upload-container {
+                padding: 20px;
+            }
+        }
+
+        /* ===== CUSTOM SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light-gray);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-green);
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .text-gradient {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .bg-gradient {
+            background: var(--gradient-primary) !important;
+        }
+
+        .border-gradient {
+            border: 2px solid transparent;
+            background: linear-gradient(var(--white), var(--white)) padding-box,
+                        var(--gradient-primary) border-box;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* ===== PAGE TRANSITIONS ===== */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== BADGES ===== */
+        .badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .badge-primary {
+            background: var(--gradient-primary) !important;
+            color: white !important;
+        }
+
+        /* ===== LOADING STATES ===== */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="#" onclick="showPage('home')">
+                <i class="fas fa-cube"></i>
+                Minecraft Addon GG
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="showPage('home')">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('upload')">
+                            <i class="fas fa-cloud-upload-alt me-1"></i>Upload
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('dashboard')">
+                            <i class="fas fa-user-circle me-1"></i>Dashboard
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex ms-lg-3" id="authButtons">
+                    <button class="btn btn-outline-primary me-2" onclick="showPage('login')">
+                        <i class="fas fa-sign-in-alt me-1"></i>Login
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== PAGES ==================== -->
+
+    <!-- Home Page -->
+    <div id="home-page" class="page active">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h1 class="hero-title">
+                            Temukan Addon Minecraft Terbaik untuk Bedrock Edition
+                        </h1>
+                        <p class="hero-subtitle">
+                            Platform komunitas untuk berbagi dan menemukan addon Minecraft terbaik. 
+                            Gratis, aman, dan selalu terupdate.
+                        </p>
+                        <div class="d-flex flex-wrap gap-3 mb-4">
+                            <button class="btn btn-primary" onclick="showPage('upload')">
+                                <i class="fas fa-cloud-upload-alt me-2"></i>Upload Addon
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="showPage('login')">
+                                <i class="fas fa-rocket me-2"></i>Bergabung Sekarang
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="text-center float-animation">
+                            <div class="position-relative d-inline-block">
+                                <div class="bg-gradient rounded-circle p-4 shadow-lg" style="width: 300px; height: 300px;">
+                                    <i class="fas fa-cubes text-white" style="font-size: 8rem;"></i>
+                                </div>
+                                <div class="position-absolute top-0 start-0 bg-primary-green rounded-circle p-3" style="width: 80px; height: 80px; transform: translate(-20px, -20px);">
+                                    <i class="fas fa-download text-white" style="font-size: 2rem;"></i>
+                                </div>
+                                <div class="position-absolute bottom-0 end-0 bg-accent-green rounded-circle p-3" style="width: 80px; height: 80px; transform: translate(20px, 20px);">
+                                    <i class="fas fa-users text-white" style="font-size: 2rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="hero-stats">
+                    <div class="row text-center">
+                        <div class="col-md-3 col-6 mb-4">
+                            <div class="display-4 fw-bold text-gradient">0</div>
+                            <p class="text-muted mb-0">Addon Tersedia</p>
+                        </div>
+                        <div class="col-md-3 col-6 mb-4">
+                            <div class="display-4 fw-bold text-gradient">0</div>
+                            <p class="text-muted mb-0">Total Download</p>
+                        </div>
+                        <div class="col-md-3 col-6 mb-4">
+                            <div class="display-4 fw-bold text-gradient">0</div>
+                            <p class="text-muted mb-0">Pengguna</p>
+                        </div>
+                        <div class="col-md-3 col-6 mb-4">
+                            <div class="display-4 fw-bold text-gradient">100%</div>
+                            <p class="text-muted mb-0">Gratis</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-5">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold mb-3">Mengapa Memilih Kami?</h2>
+                    <p class="text-muted">Platform addon Minecraft terbaik dengan fitur unggulan</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Aman & Terpercaya</h4>
+                            <p class="text-muted">Setiap addon diverifikasi untuk keamanan dan kompatibilitas dengan Minecraft Bedrock</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Download Cepat</h4>
+                            <p class="text-muted">Download addon dengan kecepatan tinggi melalui MediaFire tanpa batasan</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h4 class="fw-bold mb-3">Komunitas Aktif</h4>
+                            <p class="text-muted">Bergabung dengan komunitas pengembang dan pemain Minecraft terbesar</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold mb-3">Cara Kerjanya</h2>
+                    <p class="text-muted">Mulai dalam 3 langkah mudah</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card border-0 bg-white shadow-sm h-100">
+                            <div class="card-body p-4 text-center">
+                                <div class="bg-gradient-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                                    <span class="text-white fw-bold display-6">1</span>
+                                </div>
+                                <h4 class="fw-bold mb-3">Login dengan Google</h4>
+                                <p class="text-muted">Masuk dengan akun Google Anda untuk mulai mengupload addon</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 bg-white shadow-sm h-100">
+                            <div class="card-body p-4 text-center">
+                                <div class="bg-gradient-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                                    <span class="text-white fw-bold display-6">2</span>
+                                </div>
+                                <h4 class="fw-bold mb-3">Upload Addon</h4>
+                                <p class="text-muted">Upload file addon Anda dengan deskripsi dan screenshot yang menarik</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 bg-white shadow-sm h-100">
+                            <div class="card-body p-4 text-center">
+                                <div class="bg-gradient-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                                    <span class="text-white fw-bold display-6">3</span>
+                                </div>
+                                <h4 class="fw-bold mb-3">Bagikan & Dapatkan Download</h4>
+                                <p class="text-muted">Addon Anda akan tersedia untuk diunduh oleh seluruh komunitas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Empty State (No Addons Yet) -->
+        <section class="py-5">
+            <div class="container">
+                <div class="empty-state">
+                    <div class="empty-icon mb-4">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">Belum Ada Addon Tersedia</h3>
+                    <p class="text-muted mb-4">Jadilah yang pertama mengupload addon dan dapatkan pengakuan dari komunitas!</p>
+                    <button class="btn btn-primary btn-lg" onclick="showPage('upload')">
+                        <i class="fas fa-cloud-upload-alt me-2"></i>Upload Addon Pertama
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-5 bg-gradient text-white">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h2 class="fw-bold mb-3">Siap Berbagi Addon Anda?</h2>
+                        <p class="mb-0">Bergabunglah dengan komunitas pengembang addon Minecraft terbesar</p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <button class="btn btn-light btn-lg" onclick="showPage('login')">
+                            <i class="fas fa-rocket me-2"></i>Mulai Sekarang
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login-page" class="page">
+        <div class="login-container">
+            <div class="container">
+                <div class="login-card">
+                    <div class="login-header">
+                        <i class="fas fa-user-lock fa-3x mb-3"></i>
+                        <h2 class="fw-bold mb-2">Selamat Datang Kembali</h2>
+                        <p>Login untuk mulai mengupload addon Anda</p>
+                    </div>
+                    
+                    <div class="login-body">
+                        <div class="text-center mb-5">
+                            <h4 class="fw-bold mb-3">Login dengan Google</h4>
+                            <p class="text-muted mb-4">Cara tercepat dan teraman untuk masuk ke akun Anda</p>
+                            
+                            <button class="btn btn-google mb-4" onclick="loginWithGoogle()">
+                                <i class="fab fa-google"></i>
+                                <span>Lanjutkan dengan Google</span>
+                            </button>
+                            
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-lock me-1"></i>
+                                Data Anda aman dengan Google
+                            </p>
+                        </div>
+                        
+                        <div class="text-center">
+                            <p class="text-muted mb-3">Hanya ingin melihat-lihat?</p>
+                            <button class="btn btn-outline-primary" onclick="showPage('home')">
+                                <i class="fas fa-home me-1"></i>Kembali ke Home
+                            </button>
+                        </div>
+                        
+                        <!-- Benefits of Login -->
+                        <div class="mt-5 pt-4 border-top">
+                            <h5 class="fw-bold mb-3">Keuntungan Bergabung:</h5>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary-green rounded-circle p-2 me-3">
+                                            <i class="fas fa-upload text-white"></i>
+                                        </div>
+                                        <span>Upload Addon</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary-green rounded-circle p-2 me-3">
+                                            <i class="fas fa-chart-line text-white"></i>
+                                        </div>
+                                        <span>Statistik Download</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary-green rounded-circle p-2 me-3">
+                                            <i class="fas fa-star text-white"></i>
+                                        </div>
+                                        <span>Reputasi Komunitas</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary-green rounded-circle p-2 me-3">
+                                            <i class="fas fa-trophy text-white"></i>
+                                        </div>
+                                        <span>Pencapaian</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Page -->
+    <div id="upload-page" class="page">
+        <div class="container py-5 mt-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="d-flex align-items-center mb-5">
+                        <button class="btn btn-outline-primary me-4" onclick="showPage('home')">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <div>
+                            <h1 class="fw-bold mb-2">Upload Addon Baru</h1>
+                            <p class="text-muted">Bagikan karya Anda dengan komunitas Minecraft</p>
+                        </div>
+                    </div>
+                    
+                    <div class="upload-container">
+                        <form id="uploadForm" onsubmit="handleUpload(event)">
+                            <!-- Step Indicator -->
+                            <div class="mb-5">
+                                <div class="d-flex align-items-center">
+                                    <div class="step active">
+                                        <div class="step-number">1</div>
+                                        <div class="step-label">Informasi Addon</div>
+                                    </div>
+                                    <div class="step-line"></div>
+                                    <div class="step">
+                                        <div class="step-number">2</div>
+                                        <div class="step-label">File & Screenshot</div>
+                                    </div>
+                                    <div class="step-line"></div>
+                                    <div class="step">
+                                        <div class="step-number">3</div>
+                                        <div class="step-label">Review & Upload</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 1: Addon Information -->
+                            <div class="step-content active">
+                                <h4 class="fw-bold mb-4">
+                                    <i class="fas fa-info-circle me-2 text-primary-green"></i>
+                                    Informasi Addon
+                                </h4>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Nama Addon *</label>
+                                    <input type="text" class="form-control" required 
+                                           placeholder="Contoh: Epic Sword Addon Pack">
+                                    <div class="form-text">Beri nama yang menarik dan deskriptif</div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Deskripsi *</label>
+                                    <textarea class="form-control" rows="5" required
+                                              placeholder="Jelaskan fitur-fitur addon Anda secara detail..."></textarea>
+                                    <div class="form-text">Jelaskan apa yang addon ini lakukan dan fitur spesialnya</div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label fw-bold">Kategori *</label>
+                                        <select class="form-select" required>
+                                            <option value="">Pilih Kategori</option>
+                                            <option value="weapons">Senjata</option>
+                                            <option value="mobs">Mobs & Kreatur</option>
+                                            <option value="maps">Peta</option>
+                                            <option value="textures">Texture Pack</option>
+                                            <option value="tools">Alat</option>
+                                            <option value="mods">Modifikasi</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label fw-bold">Versi Minecraft</label>
+                                        <select class="form-select">
+                                            <option value="any">Semua Versi</option>
+                                            <option value="1.20">1.20 (Terbaru)</option>
+                                            <option value="1.19">1.19</option>
+                                            <option value="1.18">1.18</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mt-5">
+                                    <button type="button" class="btn btn-outline-primary" onclick="showPage('home')">
+                                        <i class="fas fa-times me-1"></i>Batal
+                                    </button>
+                                    <button type="button" class="btn btn-primary" onclick="nextStep()">
+                                        Lanjut <i class="fas fa-arrow-right ms-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 2: Files & Screenshots -->
+                            <div class="step-content">
+                                <h4 class="fw-bold mb-4">
+                                    <i class="fas fa-file-archive me-2 text-primary-green"></i>
+                                    File & Screenshot
+                                </h4>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">MediaFire Download Link *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-link"></i>
+                                        </span>
+                                        <input type="url" class="form-control" required
+                                               placeholder="https://www.mediafire.com/file/.../YourAddon.mcpack">
+                                    </div>
+                                    <div class="form-text">
+                                        <a href="https://www.mediafire.com" target="_blank" class="text-decoration-none">
+                                            <i class="fas fa-external-link-alt me-1"></i>
+                                            Upload file ke MediaFire terlebih dahulu
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Screenshot</label>
+                                    <div class="border rounded p-4 text-center">
+                                        <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                                        <p class="text-muted mb-3">Drag & drop screenshot atau klik untuk upload</p>
+                                        <button type="button" class="btn btn-outline-primary">
+                                            <i class="fas fa-upload me-1"></i>Pilih File
+                                        </button>
+                                        <div class="form-text mt-3">Maksimal 5 screenshot (format: JPG, PNG)</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mt-5">
+                                    <button type="button" class="btn btn-outline-primary" onclick="prevStep()">
+                                        <i class="fas fa-arrow-left me-1"></i>Kembali
+                                    </button>
+                                    <button type="button" class="btn btn-primary" onclick="nextStep()">
+                                        Lanjut <i class="fas fa-arrow-right ms-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 3: Review & Upload -->
+                            <div class="step-content">
+                                <h4 class="fw-bold mb-4">
+                                    <i class="fas fa-check-circle me-2 text-primary-green"></i>
+                                    Review & Upload
+                                </h4>
+                                
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <strong>Hampir selesai!</strong> Review informasi addon Anda sebelum upload
+                                </div>
+                                
+                                <div class="card border-0 bg-light mb-4">
+                                    <div class="card-body">
+                                        <h5 class="fw-bold mb-3">Preview Addon</h5>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <p class="mb-2"><strong>Nama:</strong> <span id="previewName">-</span></p>
+                                                <p class="mb-2"><strong>Kategori:</strong> <span id="previewCategory">-</span></p>
+                                            </div>
+                                            <div class="col-6">
+                                                <p class="mb-2"><strong>Versi MC:</strong> <span id="previewVersion">-</span></p>
+                                                <p class="mb-2"><strong>Uploader:</strong> <span id="previewUploader">-</span></p>
+                                            </div>
+                                        </div>
+                                        <p class="mb-0"><strong>Deskripsi:</strong> <span id="previewDescription">-</span></p>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" required id="termsCheck">
+                                    <label class="form-check-label" for="termsCheck">
+                                        Saya setuju dengan 
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Syarat & Ketentuan</a>
+                                        dan mengkonfirmasi bahwa ini adalah karya original saya
+                                    </label>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mt-5">
+                                    <button type="button" class="btn btn-outline-primary" onclick="prevStep()">
+                                        <i class="fas fa-arrow-left me-1"></i>Kembali
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-cloud-upload-alt me-1"></i>Upload Addon
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Upload Guidelines -->
+                    <div class="card border-0 shadow-sm mt-4">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-3">
+                                <i class="fas fa-lightbulb me-2 text-warning"></i>
+                                Tips Upload yang Baik
+                            </h5>
+                            <ul class="mb-0">
+                                <li class="mb-2">Pastikan file dalam format .mcpack, .mcaddon, atau .mcworld</li>
+                                <li class="mb-2">Gunakan screenshot yang jelas dan menarik</li>
+                                <li class="mb-2">Tulis deskripsi yang detail dan informatif</li>
+                                <li class="mb-2">Test addon Anda sebelum mengupload</li>
+                                <li>Hanya upload addon yang Anda buat sendiri atau memiliki izin</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboard-page" class="page">
+        <div class="dashboard-header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="fw-bold mb-3">Dashboard Saya</h1>
+                        <p class="mb-0">Kelola addon yang Anda upload dan pantau statistik</p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <button class="btn btn-light" onclick="showPage('upload')">
+                            <i class="fas fa-plus me-1"></i>Upload Baru
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container py-5">
+            <!-- User Profile -->
+            <div class="card shadow-lg border-0 mb-5" style="margin-top: -60px;">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=2ecc71&color=fff&size=120" 
+                                 alt="User" class="user-avatar">
+                        </div>
+                        <div class="col">
+                            <h3 class="fw-bold mb-2" id="userName">Pengguna Baru</h3>
+                            <p class="text-muted mb-0" id="userEmail">user@example.com</p>
+                            <div class="d-flex gap-2 mt-3">
+                                <span class="badge bg-primary">
+                                    <i class="fas fa-star me-1"></i>Anggota Baru
+                                </span>
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i>Terverifikasi
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-outline-danger" onclick="logout()">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-3 col-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-gradient-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-cloud-upload-alt text-white fa-lg"></i>
+                            </div>
+                            <h3 class="fw-bold mb-2">0</h3>
+                            <p class="text-muted mb-0">Total Upload</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-gradient-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-download text-white fa-lg"></i>
+                            </div>
+                            <h3 class="fw-bold mb-2">0</h3>
+                            <p class="text-muted mb-0">Total Download</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-gradient-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-heart text-white fa-lg"></i>
+                            </div>
+                            <h3 class="fw-bold mb-2">0</h3>
+                            <p class="text-muted mb-0">Suka</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="bg-gradient-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-trophy text-white fa-lg"></i>
+                            </div>
+                            <h3 class="fw-bold mb-2">-</h3>
+                            <p class="text-muted mb-0">Peringkat</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- My Addons Section -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-4">
+                    <h4 class="fw-bold mb-0">
+                        <i class="fas fa-box me-2 text-primary-green"></i>
+                        Addon Saya
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="empty-state">
+                        <div class="empty-icon mb-4">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">Belum Ada Addon</h4>
+                        <p class="text-muted mb-4">Mulai perjalanan Anda dengan mengupload addon pertama</p>
+                        <button class="btn btn-primary" onclick="showPage('upload')">
+                            <i class="fas fa-cloud-upload-alt me-2"></i>Upload Addon Pertama
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h4 class="fw-bold mb-4">Aksi Cepat</h4>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-cogs fa-2x text-primary-green mb-3"></i>
+                            <h5>Pengaturan Akun</h5>
+                            <p class="text-muted small mb-0">Atur preferensi dan informasi akun Anda</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-chart-bar fa-2x text-primary-green mb-3"></i>
+                            <h5>Statistik Detail</h5>
+                            <p class="text-muted small mb-0">Analisis performa addon Anda</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-question-circle fa-2x text-primary-green mb-3"></i>
+                            <h5>Bantuan & FAQ</h5>
+                            <p class="text-muted small mb-0">Temukan jawaban untuk pertanyaan umum</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Syarat & Ketentuan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 class="fw-bold mb-3">Dengan mengupload addon, Anda setuju dengan:</h6>
+                    <ol class="mb-4">
+                        <li class="mb-2">Anda adalah pembuat addon atau memiliki izin untuk membagikannya</li>
+                        <li class="mb-2">Addon tidak melanggar hak cipta atau merek dagang pihak lain</li>
+                        <li class="mb-2">Addon aman dan tidak mengandung malware atau konten berbahaya</li>
+                        <li class="mb-2">Addon sesuai dengan rating usia Minecraft (E untuk Everyone)</li>
+                        <li class="mb-2">Kami berhak menghapus addon yang melanggar aturan tanpa pemberitahuan</li>
+                        <li>Nama Anda akan ditampilkan sebagai uploader dan bertanggung jawab atas konten</li>
+                    </ol>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Minecraft Addon GG tidak berafiliasi dengan Mojang Studios atau Microsoft. 
+                        Semua addon dibuat dan diupload oleh komunitas.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Saya Mengerti</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-cube me-2"></i>
+                        Minecraft Addon GG
+                    </h5>
+                    <p class="text-light mb-4">
+                        Platform komunitas untuk berbagi addon Minecraft Bedrock. 
+                        Gratis, aman, dan dibuat untuk pemain oleh pemain.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-white fs-5"><i class="fab fa-discord"></i></a>
+                        <a href="#" class="text-white fs-5"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white fs-5"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="fw-bold mb-3">Navigasi</h5>
+                    <div class="footer-links">
+                        <a href="#" onclick="showPage('home')">Home</a>
+                        <a href="#" onclick="showPage('upload')">Upload Addon</a>
+                        <a href="#" onclick="showPage('dashboard')">Dashboard</a>
+                        <a href="#" onclick="showPage('login')">Login</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="fw-bold mb-3">Legal</h5>
+                    <div class="footer-links">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Syarat & Ketentuan</a>
+                        <a href="#">Kebijakan Privasi</a>
+                        <a href="#">DMCA</a>
+                        <a href="#">Disclaimer</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 mb-4">
+                    <h5 class="fw-bold mb-3">Kontak</h5>
+                    <div class="footer-links">
+                        <a href="#"><i class="fas fa-envelope me-2"></i>support@minecraftaddongg.com</a>
+                        <a href="#"><i class="fas fa-question-circle me-2"></i>Bantuan & FAQ</a>
+                        <a href="#"><i class="fas fa-bug me-2"></i>Laporkan Bug</a>
+                    </div>
+                </div>
+            </div>
+            <hr class="bg-light my-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">
+                        &copy; 2023 Minecraft Addon GG. All rights reserved.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">
+                        Made with <i class="fas fa-heart text-danger"></i> for the Minecraft community
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // ==================== GLOBAL VARIABLES ====================
+        let currentUser = null;
+        let currentStep = 1;
+        let isLoggedIn = false;
+
+        // ==================== FIREBASE CONFIGURATION ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyB...", // Ganti dengan API key Anda
+            authDomain: "your-project.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abc123def456"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            initAuth();
+            initPage();
+            setupNavbarScroll();
+            setupStepIndicator();
+        });
+
+        function initPage() {
+            // Check if user is logged in
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                updateAuthUI();
+            }
+            
+            // Show home page by default
+            showPage('home');
+        }
+
+        function setupNavbarScroll() {
+            window.addEventListener('scroll', function() {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        }
+
+        function setupStepIndicator() {
+            const steps = document.querySelectorAll('.step');
+            steps.forEach(step => {
+                step.addEventListener('click', function() {
+                    const stepNum = parseInt(this.querySelector('.step-number').textContent);
+                    if (stepNum <= currentStep) {
+                        goToStep(stepNum);
+                    }
+                });
+            });
+        }
+
+        // ==================== PAGE NAVIGATION ====================
+        function showPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected page
+            const pageElement = document.getElementById(pageName + '-page');
+            if (pageElement) {
+                pageElement.classList.add('active');
+                
+                // Update active nav link
+                const navLink = document.querySelector(`.nav-link[onclick*="${pageName}"]`);
+                if (navLink) navLink.classList.add('active');
+                
+                // Handle page-specific logic
+                switch(pageName) {
+                    case 'home':
+                        updateHomePage();
+                        break;
+                    case 'login':
+                        if (currentUser) showPage('dashboard');
+                        break;
+                    case 'upload':
+                        if (!currentUser) {
+                            alert('Silakan login terlebih dahulu untuk mengupload addon');
+                            showPage('login');
+                            return;
+                        }
+                        resetUploadForm();
+                        break;
+                    case 'dashboard':
+                        if (!currentUser) {
+                            alert('Silakan login terlebih dahulu');
+                            showPage('login');
+                            return;
+                        }
+                        updateDashboard();
+                        break;
+                }
+            }
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // ==================== AUTHENTICATION ====================
+        function initAuth() {
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    // User is signed in
+                    currentUser = {
+                        uid: user.uid,
+                        name: user.displayName || 'Pengguna',
+                        email: user.email,
+                        photoURL: user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=2ecc71&color=fff&size=120`
+                    };
+                    
+                    // Save to localStorage
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    
+                    // Get and save token
+                    user.getIdToken().then((token) => {
+                        localStorage.setItem('token', token);
+                    });
+                    
+                    updateAuthUI();
+                    
+                    // If on login page, redirect to dashboard
+                    if (document.getElementById('login-page').classList.contains('active')) {
+                        showPage('dashboard');
+                    }
+                } else {
+                    // User is signed out
+                    currentUser = null;
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('token');
+                    updateAuthUI();
+                }
+            });
+        }
+
+        function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            firebase.auth().signInWithPopup(provider)
+                .then((result) => {
+                    console.log('Login successful:', result.user.displayName);
+                    showPage('dashboard');
+                })
+                .catch((error) => {
+                    console.error('Login error:', error);
+                    alert('Login gagal: ' + error.message);
+                });
+        }
+
+        function logout() {
+            firebase.auth().signOut()
+                .then(() => {
+                    currentUser = null;
+                    showPage('home');
+                })
+                .catch((error) => {
+                    console.error('Logout error:', error);
+                });
+        }
+
+        function updateAuthUI() {
+            const authButtons = document.getElementById('authButtons');
+            
+            if (currentUser) {
+                authButtons.innerHTML = `
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center" 
+                                type="button" data-bs-toggle="dropdown">
+                            <img src="${currentUser.photoURL}" alt="${currentUser.name}" 
+                                 class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                            <span class="d-none d-md-inline">${currentUser.name}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="showPage('dashboard')">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="showPage('upload')">
+                                    <i class="fas fa-cloud-upload-alt me-2"></i>Upload Addon
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <button class="dropdown-item text-danger" onclick="logout()">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                authButtons.innerHTML = `
+                    <button class="btn btn-outline-primary me-2" onclick="showPage('login')">
+                        <i class="fas fa-sign-in-alt me-1"></i>Login
+                    </button>
+                `;
+            }
+        }
+
+        // ==================== UPLOAD FORM STEPS ====================
+        function nextStep() {
+            if (currentStep < 3) {
+                currentStep++;
+                updateStepIndicator();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepIndicator();
+            }
+        }
+
+        function goToStep(step) {
+            currentStep = step;
+            updateStepIndicator();
+        }
+
+        function updateStepIndicator() {
+            // Update step numbers
+            document.querySelectorAll('.step').forEach((step, index) => {
+                const stepNum = index + 1;
+                if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (stepNum === currentStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+            
+            // Update step content visibility
+            document.querySelectorAll('.step-content').forEach((content, index) => {
+                const stepNum = index + 1;
+                if (stepNum === currentStep) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+            
+            // Update preview data on step 3
+            if (currentStep === 3) {
+                updatePreviewData();
+            }
+        }
+
+        function updatePreviewData() {
+            const form = document.getElementById('uploadForm');
+            const previewName = form.querySelector('input[type="text"]').value || '-';
+            const previewCategory = form.querySelector('select').value || '-';
+            const previewDescription = form.querySelector('textarea').value || '-';
+            
+            document.getElementById('previewName').textContent = previewName;
+            document.getElementById('previewCategory').textContent = previewCategory;
+            document.getElementById('previewDescription').textContent = previewDescription;
+            document.getElementById('previewVersion').textContent = '1.20+';
+            document.getElementById('previewUploader').textContent = currentUser ? currentUser.name : '-';
+        }
+
+        function resetUploadForm() {
+            currentStep = 1;
+            updateStepIndicator();
+            document.getElementById('uploadForm').reset();
+        }
+
+        function handleUpload(event) {
+            event.preventDefault();
+            
+            if (!currentUser) {
+                alert('Silakan login terlebih dahulu');
+                showPage('login');
+                return;
+            }
+            
+            // Collect form data
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Uploading...';
+            submitBtn.disabled = true;
+            
+            // Simulate upload delay
+            setTimeout(() => {
+                // In production, send to your API here
+                // fetch('https://your-api.com/api/addons', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Authorization': `Bearer ${localStorage.getItem('token')}`
+                //     },
+                //     body: formData
+                // })
+                
+                // Show success message
+                alert('Addon berhasil diupload! 🎉\nAddon Anda akan diverifikasi sebelum ditampilkan.');
+                
+                // Reset form
+                resetUploadForm();
+                
+                // Restore button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                // Go to dashboard
+                showPage('dashboard');
+            }, 1500);
+        }
+
+        // ==================== PAGE UPDATES ====================
+        function updateHomePage() {
+            // Update stats (for demo)
+            const stats = document.querySelectorAll('.hero-stats .display-4');
+            if (stats.length >= 3) {
+                // These would come from API in production
+                stats[0].textContent = '0'; // Addon count
+                stats[1].textContent = '0'; // Download count
+                stats[2].textContent = '1'; // User count (at least current user)
+            }
+        }
+
+        function updateDashboard() {
+            if (!currentUser) return;
+            
+            // Update user info
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('userAvatar').src = currentUser.photoURL;
+            
+            // Update stats
+            // These would come from API in production
+            const stats = document.querySelectorAll('#dashboard-page .fw-bold');
+            if (stats.length >= 4) {
+                stats[0].textContent = '0'; // Total upload
+                stats[1].textContent = '0'; // Total download
+                stats[2].textContent = '0'; // Likes
+                stats[3].textContent = '-'; // Rank
+            }
+        }
+
+        // ==================== UI ENHANCEMENTS ====================
+        // Add CSS for step indicator
+        const style = document.createElement('style');
+        style.textContent = `
+            .step {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                cursor: pointer;
+                flex: 1;
+            }
+            
+            .step-number {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: #e9ecef;
+                color: #6c757d;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                margin-bottom: 8px;
+                transition: all 0.3s ease;
+            }
+            
+            .step.active .step-number {
+                background: var(--gradient-primary);
+                color: white;
+                transform: scale(1.1);
+            }
+            
+            .step.completed .step-number {
+                background: #2ecc71;
+                color: white;
+            }
+            
+            .step-label {
+                font-size: 0.9rem;
+                color: #6c757d;
+                text-align: center;
+            }
+            
+            .step.active .step-label {
+                color: #2ecc71;
+                font-weight: 600;
+            }
+            
+            .step-line {
+                flex: 1;
+                height: 2px;
+                background: #e9ecef;
+                margin: 20px 10px 0;
+            }
+            
+            .step-content {
+                display: none;
+            }
+            
+            .step-content.active {
+                display: block;
+                animation: fadeIn 0.5s ease;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
